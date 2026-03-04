@@ -1,5 +1,5 @@
 import React from 'react'
-import type { UserRole } from '@/app/type/general'
+import type { UserRole } from '@/types/general-type'
 
 interface RoleGatewayProps {
   superadmin?: React.ReactNode

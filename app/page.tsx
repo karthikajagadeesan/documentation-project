@@ -8,8 +8,9 @@ import ComponentsSection from "@/components/home/ComponentsSection";
 import TechnologySection from "@/components/home/TechnologySection";
 import ArchitectureSection from "@/components/home/ArchitectureSection";
 import ConclusionSection from "@/components/home/ConclusionSection";
+import type { Anchor } from "@/types/general-type";
 
-const anchors = [
+const anchors: Anchor[] = [
   { id: "getting-started", title: "Getting Started" },
   { id: "technical-stack", title: "Technical Stack Overview" },
   { id: "frontend", title: "Frontend Technologies" },
@@ -26,13 +27,19 @@ export default async function Home() {
   await requireAuth();
 
   return (
-    <div className="relative flex min-h-screen flex-col smooth-scroll">
+    // Full viewport height, fixed navbar, nothing on body overflows
+    <div className="flex h-screen flex-col overflow-hidden">
       <Navbar />
-      <div className="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)_200px] lg:grid-cols-[240px_minmax(0,1fr)_240px] md:gap-6 lg:gap-10 px-4 md:px-8">
+
+      {/* Content row — sits below the 56px navbar */}
+      <div className="flex flex-1 overflow-hidden pt-14">
+
+        {/* Left sidebar — fixed height, independently scrollable */}
         <Sidebar />
 
-        <main className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_0px]">
-          <div className="mx-auto w-full min-w-0">
+        {/* Center content — ONLY this area scrolls */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="mx-auto w-full max-w-4xl min-w-0 px-6 py-8">
             <GettingStartedSection />
             <LayoutSection />
             <ComponentsSection />
@@ -42,6 +49,7 @@ export default async function Home() {
           </div>
         </main>
 
+        {/* Right TOC sidebar — fixed height, independently scrollable */}
         <OnThisPage anchors={anchors} />
       </div>
     </div>

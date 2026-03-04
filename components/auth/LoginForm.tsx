@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
-import type { LoginFormValues } from '@/app/type/general'
+import type { LoginFormValues } from '@/types/general-type'
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),

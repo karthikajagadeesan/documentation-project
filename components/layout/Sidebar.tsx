@@ -18,9 +18,7 @@ const navItems: NavItem[] = [
   {
     title: "Layout",
     href: "#layout",
-    items: [
-      { title: "Project Structure", href: "#layout" },
-    ],
+    items: [{ title: "Project Structure", href: "#layout" }],
   },
   {
     title: "Components",
@@ -59,7 +57,7 @@ const Sidebar = () => {
   };
 
   return (
-    <aside className="fixed top-14 z-30 -ml-2 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 md:sticky md:block md:w-64 overflow-y-auto border-r px-4 py-6 md:px-8">
+    <aside className="hidden w-56 shrink-0 md:flex md:flex-col overflow-y-auto border-r px-4 py-6">
       <div className="w-full">
         <div className="space-y-4">
           {navItems.map((item) => (
@@ -95,7 +93,7 @@ const Sidebar = () => {
                   {item.items.map((subItem) => (
                     <Link
                       key={subItem.title}
-                      href={subItem.href || ""}
+                      href={subItem.href ?? ""}
                       className="block rounded-md px-2 py-1 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                     >
                       {subItem.title}

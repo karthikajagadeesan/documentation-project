@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import type { Anchor } from "@/app/type/general";
+import type { Anchor } from "@/types/general-type";
 
 interface OnThisPageProps {
   anchors: Anchor[];
@@ -33,8 +33,8 @@ const OnThisPage = ({ anchors }: OnThisPageProps) => {
   if (anchors.length === 0) return null;
 
   return (
-    <div className="hidden text-sm xl:block">
-      <div className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto px-4 py-6">
+    <div className="hidden w-56 shrink-0 text-sm xl:block">
+      <div className="sticky top-0 h-full overflow-y-auto px-4 py-6">
         <h4 className="mb-4 font-medium leading-none uppercase tracking-wider text-muted-foreground text-[11px]">
           On this page
         </h4>

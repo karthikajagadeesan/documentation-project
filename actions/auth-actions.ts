@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import * as z from 'zod'
-import type { AuthActionResult, SignupFormValues } from '@/app/type/general'
+import type { AuthActionResult, SignupFormValues } from '@/types/general-type'
 
 const loginSchema = z.object({
   email: z.string().email(),

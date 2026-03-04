@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
-import type { SignupFormValues } from '@/app/type/general'
+import type { SignupFormValues } from '@/types/general-type'
 
 const signupSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
