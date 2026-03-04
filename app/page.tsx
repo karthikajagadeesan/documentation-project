@@ -1,65 +1,49 @@
-import Image from "next/image";
+import Navbar from "@/components/layout/Navbar";
+import Sidebar from "@/components/layout/Sidebar";
+import OnThisPage from "@/components/layout/OnThisPage";
+import { requireAuth } from "@/lib/supabase/proxy";
+import GettingStartedSection from "@/components/home/GettingStartedSection";
+import LayoutSection from "@/components/home/LayoutSection";
+import ComponentsSection from "@/components/home/ComponentsSection";
+import TechnologySection from "@/components/home/TechnologySection";
+import ArchitectureSection from "@/components/home/ArchitectureSection";
+import ConclusionSection from "@/components/home/ConclusionSection";
 
-export default function Home() {
+const anchors = [
+  { id: "getting-started", title: "Getting Started" },
+  { id: "technical-stack", title: "Technical Stack Overview" },
+  { id: "frontend", title: "Frontend Technologies" },
+  { id: "backend", title: "Backend Technologies" },
+  { id: "database", title: "Database Layer" },
+  { id: "layout", title: "Layout & Project Structure" },
+  { id: "components", title: "Components" },
+  { id: "technology", title: "Technology Stack" },
+  { id: "architecture", title: "Architecture Overview" },
+  { id: "conclusion", title: "Conclusion" },
+];
+
+export default async function Home() {
+  await requireAuth();
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div className="relative flex min-h-screen flex-col smooth-scroll">
+      <Navbar />
+      <div className="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)_200px] lg:grid-cols-[240px_minmax(0,1fr)_240px] md:gap-6 lg:gap-10 px-4 md:px-8">
+        <Sidebar />
+
+        <main className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_0px]">
+          <div className="mx-auto w-full min-w-0">
+            <GettingStartedSection />
+            <LayoutSection />
+            <ComponentsSection />
+            <TechnologySection />
+            <ArchitectureSection />
+            <ConclusionSection />
+          </div>
+        </main>
+
+        <OnThisPage anchors={anchors} />
+      </div>
     </div>
   );
 }
