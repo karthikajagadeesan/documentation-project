@@ -49,12 +49,30 @@ const navItems: NavItem[] = [
 ];
 
 const Sidebar = ({ className, onLinkClick }: { className?: string; onLinkClick?: () => void }) => {
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({
-    Layout: true,
-    Components: true,
-    Technology: true,
-  });
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [activeHref, setActiveHref] = useState<string>("");
+
+  React.useEffect(() => {
+    // Sync expanded state from localStorage
+    const saved = localStorage.getItem("sidebar-expanded");
+    if (saved) {
+      try {
+        setExpanded(JSON.parse(saved));
+      } catch (e) {
+        setExpanded({
+          Layout: false,
+          Components: true,
+          Technology: false,
+        });
+      }
+    } else {
+      setExpanded({
+        Layout: false,
+        Components: true,
+        Technology: false,
+      });
+    }
+  }, []);
 
   React.useEffect(() => {
     setActiveHref(window.location.hash);
@@ -74,7 +92,11 @@ const Sidebar = ({ className, onLinkClick }: { className?: string; onLinkClick?:
   };
 
   const toggleExpand = (title: string) => {
-    setExpanded((prev) => ({ ...prev, [title]: !prev[title] }));
+    setExpanded((prev) => {
+      const newState = { ...prev, [title]: !prev[title] };
+      localStorage.setItem("sidebar-expanded", JSON.stringify(newState));
+      return newState;
+    });
   };
 
   return (

@@ -48,7 +48,7 @@ const OnThisPage = ({ anchors }: OnThisPageProps) => {
                 href={`#${anchor.id}`}
                 className={cn(
                   "inline-block no-underline transition-colors hover:text-foreground",
-                  activeId === anchor.id
+                  activeId === anchor.id || (anchor.id === "technology" && ["nextjs", "supabase", "shadcn", "zustand", "tanstack"].includes(activeId))
                     ? "font-medium text-primary"
                     : "text-muted-foreground"
                 )}

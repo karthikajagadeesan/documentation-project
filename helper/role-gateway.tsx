@@ -9,10 +9,10 @@ interface RoleGatewayProps {
 
 export async function RoleGateway({ superadmin, user, fallback }: RoleGatewayProps) {
   // TODO: Replace with real role lookup from Supabase profiles table.
-  let currentRole: UserRole = 'user'
+  const currentRole: UserRole = 'user'
 
-  if ((currentRole as any) === 'superadmin') return <>{superadmin}</>
-  if ((currentRole as any) === 'user') return <>{user}</>
+  if ((currentRole as string) === 'superadmin') return <>{superadmin}</>
+  if ((currentRole as string) === 'user') return <>{user}</>
 
   return <>{fallback ?? <div>Access Denied</div>}</>
 }
