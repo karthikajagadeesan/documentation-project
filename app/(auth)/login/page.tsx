@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import { RoleGateway } from '@/helper/role-gateway'
-import { LoadingState } from '@/components/ui/loading-state'
+import { LoadingState } from '@/components/loading-state'
 import UserLogin from './user'
 import SuperAdminLogin from './superadmin'
 

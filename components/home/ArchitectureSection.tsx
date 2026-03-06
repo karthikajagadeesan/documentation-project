@@ -1,4 +1,5 @@
 import { ChevronRight } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 const architectureItems = [
   { label: "Frontend", value: "Next.js" },
@@ -23,15 +24,15 @@ export default function ArchitectureSection() {
       </h2>
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {architectureItems.map((item) => (
-          <div
+          <Card
             key={item.label}
-            className="rounded-lg border bg-card p-4 flex flex-col items-center text-center"
+            className="flex flex-col items-center text-center p-4"
           >
             <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground line-clamp-1">
               {item.label}
             </span>
             <span className="mt-1 text-lg font-medium">→ {item.value}</span>
-          </div>
+          </Card>
         ))}
       </div>
     </section>

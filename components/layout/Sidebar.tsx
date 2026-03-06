@@ -1,8 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useTransition } from "react";
 import Link from "next/link";
-import { ChevronRight, ChevronDown } from "lucide-react";
+import { ChevronRight, ChevronDown, LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { signOut } from "@/app/actions/auth-actions";
+import { createClient } from "@/lib/supabase/client";
 
 interface NavItem {
   title: string;
@@ -18,26 +21,26 @@ const navItems: NavItem[] = [
   {
     title: "Layout",
     href: "#layout",
-    items: [{ title: "Project Structure", href: "#layout" }],
+    items: [{ title: "Project Structure", href: "#project-structure" }],
   },
   {
     title: "Components",
     href: "#components",
   },
   {
+    title: "Sample Code Structure",
+    href: "#sample-code",
+  },
+  {
     title: "Technology",
     href: "#technology",
     items: [
-      { title: "Next.js", href: "#technology" },
-      { title: "Supabase", href: "#technology" },
-      { title: "ShadCN", href: "#technology" },
-      { title: "Zustand", href: "#technology" },
-      { title: "TanStack Query", href: "#technology" },
+      { title: "Next.js", href: "#nextjs" },
+      { title: "Supabase", href: "#supabase" },
+      { title: "ShadCN", href: "#shadcn" },
+      { title: "Zustand", href: "#zustand" },
+      { title: "TanStack Query", href: "#tanstack" },
     ],
-  },
-  {
-    title: "Architecture Overview",
-    href: "#architecture",
   },
   {
     title: "Conclusion",
@@ -45,59 +48,102 @@ const navItems: NavItem[] = [
   },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ className, onLinkClick }: { className?: string; onLinkClick?: () => void }) => {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({
     Layout: true,
     Components: true,
     Technology: true,
   });
+  const [activeHref, setActiveHref] = useState<string>("");
+
+  React.useEffect(() => {
+    setActiveHref(window.location.hash);
+    const handleHashChange = () => setActiveHref(window.location.hash);
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+
+  const getIsActive = (href: string) => {
+    if (activeHref === href) return true;
+    
+    if (href === "#getting-started") {
+      return ["#technical-stack", "#frontend", "#backend", "#database"].includes(activeHref);
+    }
+    
+    return false;
+  };
 
   const toggleExpand = (title: string) => {
     setExpanded((prev) => ({ ...prev, [title]: !prev[title] }));
   };
 
   return (
-    <aside className="hidden w-56 shrink-0 md:flex md:flex-col overflow-y-auto border-r px-4 py-6">
-      <div className="w-full">
-        <div className="space-y-4">
+    <aside className={`flex w-56 shrink-0 flex-col overflow-hidden border-r bg-background ${className || ""}`}>
+      <div className="flex-1 overflow-y-auto px-4 py-8">
+        <div className="w-full space-y-4">
           {navItems.map((item) => (
             <div key={item.title} className="space-y-1">
               <div className="flex items-center">
                 {item.items && (
-                  <button
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={() => toggleExpand(item.title)}
-                    className="mr-2 h-4 w-4 shrink-0 transition-transform duration-200"
+                    className="mr-1 h-6 w-6 shrink-0"
                   >
                     {expanded[item.title] ? (
                       <ChevronDown className="h-4 w-4" />
                     ) : (
                       <ChevronRight className="h-4 w-4" />
                     )}
-                  </button>
+                  </Button>
                 )}
+                {!item.items && <div className="w-7 shrink-0" />}
                 {item.href ? (
-                  <Link
-                    href={item.href}
-                    className="flex w-full items-center rounded-md px-2 py-1 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+                  <Button
+                    asChild
+                    variant={getIsActive(item.href || "") ? "secondary" : "ghost"}
+                    className="h-8 w-full justify-start px-2 py-1 text-sm font-medium"
                   >
-                    {item.title}
-                  </Link>
+                    <Link 
+                      href={item.href} 
+                      onClick={() => {
+                        setActiveHref(item.href || "");
+                        if (onLinkClick) onLinkClick();
+                      }}
+                    >
+                      {item.title}
+                    </Link>
+                  </Button>
                 ) : (
-                  <span className="flex w-full cursor-default items-center rounded-md px-2 py-1 text-sm font-medium">
+                  <span className="flex h-8 w-full cursor-default items-center px-2 py-1 text-sm font-medium">
                     {item.title}
                   </span>
                 )}
               </div>
               {item.items && expanded[item.title] && (
-                <div className="ml-4 space-y-1 border-l pl-4">
+                <div className="ml-5 space-y-1 border-l pl-4">
                   {item.items.map((subItem) => (
-                    <Link
+                    <Button
                       key={subItem.title}
-                      href={subItem.href ?? ""}
-                      className="block rounded-md px-2 py-1 text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                      asChild
+                      variant={activeHref === subItem.href ? "secondary" : "ghost"}
+                      className={`h-8 w-full justify-start px-2 py-1 text-sm ${
+                        activeHref === subItem.href 
+                          ? "text-foreground font-medium" 
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
                     >
-                      {subItem.title}
-                    </Link>
+                      <Link 
+                        href={subItem.href ?? ""} 
+                        onClick={() => {
+                          setActiveHref(subItem.href ?? "");
+                          if (onLinkClick) onLinkClick();
+                        }}
+                      >
+                        {subItem.title}
+                      </Link>
+                    </Button>
                   ))}
                 </div>
               )}
@@ -105,8 +151,43 @@ const Sidebar = () => {
           ))}
         </div>
       </div>
+      <div className="border-t p-4">
+        <SignOutButton />
+      </div>
     </aside>
   );
 };
+
+function SignOutButton() {
+  const [isPending, startTransition] = useTransition();
+  const [userName, setUserName] = useState<string>("Loading...");
+
+  React.useEffect(() => {
+    const fetchUser = async () => {
+      const supabase = createClient();
+      const { data } = await supabase.auth.getUser();
+      if (data?.user) {
+        const name = data.user.user_metadata?.full_name || data.user.email?.split('@')[0] || "User";
+        setUserName(name);
+      } else {
+        setUserName("Sign Out");
+      }
+    };
+    fetchUser();
+  }, []);
+
+  return (
+    <Button
+      variant="outline"
+      className="w-full justify-between text-muted-foreground"
+      onClick={() => startTransition(() => signOut())}
+      disabled={isPending}
+      title="Sign Out"
+    >
+      <span className="truncate">{userName}</span>
+      <LogOut className={`ml-2 h-4 w-4 shrink-0 ${isPending ? "animate-pulse" : ""}`} />
+    </Button>
+  );
+}
 
 export default Sidebar;

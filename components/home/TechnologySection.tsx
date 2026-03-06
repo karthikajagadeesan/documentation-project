@@ -1,4 +1,4 @@
-import TechnologyAccordion from "@/components/TechnologyAccordion";
+import TechnologyList from "@/components/TechnologyList";
 import { ChevronRight } from "lucide-react";
 
 export default function TechnologySection() {
@@ -14,7 +14,7 @@ export default function TechnologySection() {
       <h2 className="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight">
         Technology Stack
       </h2>
-      <TechnologyAccordion />
+      <TechnologyList />
     </section>
   );
 }

@@ -1,57 +1,85 @@
 import Navbar from "@/components/layout/Navbar";
-import Sidebar from "@/components/layout/Sidebar";
-import OnThisPage from "@/components/layout/OnThisPage";
 import { requireAuth } from "@/lib/supabase/proxy";
-import GettingStartedSection from "@/components/home/GettingStartedSection";
-import LayoutSection from "@/components/home/LayoutSection";
-import ComponentsSection from "@/components/home/ComponentsSection";
-import TechnologySection from "@/components/home/TechnologySection";
-import ArchitectureSection from "@/components/home/ArchitectureSection";
-import ConclusionSection from "@/components/home/ConclusionSection";
-import type { Anchor } from "@/types/general-type";
-
-const anchors: Anchor[] = [
-  { id: "getting-started", title: "Getting Started" },
-  { id: "technical-stack", title: "Technical Stack Overview" },
-  { id: "frontend", title: "Frontend Technologies" },
-  { id: "backend", title: "Backend Technologies" },
-  { id: "database", title: "Database Layer" },
-  { id: "layout", title: "Layout & Project Structure" },
-  { id: "components", title: "Components" },
-  { id: "technology", title: "Technology Stack" },
-  { id: "architecture", title: "Architecture Overview" },
-  { id: "conclusion", title: "Conclusion" },
-];
+import Link from "next/link";
+import { Code, PenTool, SearchCheck, Users } from "lucide-react";
+import { Card } from "@/components/ui/card";
 
 export default async function Home() {
   await requireAuth();
 
+  const cards = [
+    {
+      title: "Development",
+      description: "Technical stack, architecture, and project structure guide.",
+      icon: Code,
+      href: "/development",
+      color: "text-primary",
+      bg: "bg-primary/10",
+    },
+    {
+      title: "Design",
+      description: "UI/UX guidelines, design system, and ShadCN components.",
+      icon: PenTool,
+      href: "/design",
+      color: "text-secondary-foreground",
+      bg: "bg-secondary",
+    },
+    {
+      title: "SEO",
+      description: "Search engine optimization best practices and metadata.",
+      icon: SearchCheck,
+      href: "/seo",
+      color: "text-accent-foreground",
+      bg: "bg-accent",
+    },
+    {
+      title: "HR",
+      description: "Company policies, onboarding, and employee resources.",
+      icon: Users,
+      href: "/hr",
+      color: "text-muted-foreground",
+      bg: "bg-muted",
+    },
+  ];
+
   return (
-    // Full viewport height, fixed navbar, nothing on body overflows
-    <div className="flex h-screen flex-col overflow-hidden">
+    <div className="flex min-h-screen flex-col bg-muted/20">
       <Navbar />
+      <main className="container mx-auto flex-1 px-4 py-8 pt-24">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard Overview</h1>
+          <p className="text-muted-foreground mt-2">
+            Welcome back. Select a module below to view its documentation and resources.
+          </p>
+        </div>
 
-      {/* Content row — sits below the 56px navbar */}
-      <div className="flex flex-1 overflow-hidden pt-14">
-
-        {/* Left sidebar — fixed height, independently scrollable */}
-        <Sidebar />
-
-        {/* Center content — ONLY this area scrolls */}
-        <main className="flex-1 overflow-y-auto">
-          <div className="mx-auto w-full max-w-4xl min-w-0 px-6 py-8">
-            <GettingStartedSection />
-            <LayoutSection />
-            <ComponentsSection />
-            <TechnologySection />
-            <ArchitectureSection />
-            <ConclusionSection />
-          </div>
-        </main>
-
-        {/* Right TOC sidebar — fixed height, independently scrollable */}
-        <OnThisPage anchors={anchors} />
-      </div>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {cards.map((card) => (
+            <Link 
+              key={card.title} 
+              href={card.href}
+              className="group"
+            >
+              <Card className="h-full group-hover:border-primary/50 transition-all shadow-sm group-hover:shadow-md flex flex-col justify-between p-6">
+                <div>
+                  <div className={`mb-4 inline-flex rounded-lg p-3 ${card.bg}`}>
+                    <card.icon className={`h-6 w-6 ${card.color}`} />
+                  </div>
+                  <h3 className="mb-2 font-semibold leading-none tracking-tight">
+                    {card.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {card.description}
+                  </p>
+                </div>
+                <div className="mt-4 flex items-center text-sm font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
+                  View section &rarr;
+                </div>
+              </Card>
+            </Link>
+          ))}
+        </div>
+      </main>
     </div>
   );
 }

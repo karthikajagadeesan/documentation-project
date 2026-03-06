@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import type { Anchor } from "@/types/general-type";
+import { cn } from "@/lib/utils";
 
 interface OnThisPageProps {
   anchors: Anchor[];
@@ -16,6 +17,8 @@ const OnThisPage = ({ anchors }: OnThisPageProps) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setActiveId(entry.target.id);
+            window.history.replaceState(null, "", `#${entry.target.id}`);
+            window.dispatchEvent(new HashChangeEvent("hashchange"));
           }
         });
       },
@@ -33,8 +36,8 @@ const OnThisPage = ({ anchors }: OnThisPageProps) => {
   if (anchors.length === 0) return null;
 
   return (
-    <div className="hidden w-56 shrink-0 text-sm xl:block">
-      <div className="sticky top-0 h-full overflow-y-auto px-4 py-6">
+    <div className="hidden shrink-0 text-sm lg:block lg:w-48 xl:w-56">
+      <div className="sticky top-0 h-full overflow-y-auto px-4 py-8">
         <h4 className="mb-4 font-medium leading-none uppercase tracking-wider text-muted-foreground text-[11px]">
           On this page
         </h4>
@@ -43,11 +46,12 @@ const OnThisPage = ({ anchors }: OnThisPageProps) => {
             <li key={anchor.id} className="pt-0.5">
               <a
                 href={`#${anchor.id}`}
-                className={`inline-block no-underline transition-colors hover:text-foreground ${
+                className={cn(
+                  "inline-block no-underline transition-colors hover:text-foreground",
                   activeId === anchor.id
                     ? "font-medium text-primary"
                     : "text-muted-foreground"
-                }`}
+                )}
               >
                 {anchor.title}
               </a>
