@@ -1,9 +1,6 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// General application-level types shared across components and actions.
-// ─────────────────────────────────────────────────────────────────────────────
-
 /** User role enum matching the profiles table. */
 export type UserRole = 'superadmin' | 'user'
+export type Subdomain = 'superadmin' | 'user'
 
 /** A single anchor entry used by the OnThisPage sidebar component. */
 export interface Anchor {

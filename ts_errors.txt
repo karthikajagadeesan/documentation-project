@@ -1,8 +1,0 @@
-error TS6231: Could not resolve the path '' with the extensions: '.ts', '.tsx', '.d.ts', '.cts', '.d.cts', '.mts', '.d.mts'.
-  The file is in the program because:
-    Root file specified for compilation
-npm notice
-npm notice New major version of npm available! 10.9.4 -> 11.11.0
-npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.11.0
-npm notice To update run: npm install -g npm@11.11.0
-npm notice
