@@ -13,10 +13,10 @@ export default function UserLogin() {
       <LoginForm />
       <p className="px-8 text-center text-sm text-muted-foreground">
         <Link
-          href="/signup"
+          href="/forgot-password"
           className="hover:text-brand underline underline-offset-4"
         >
-          Don&apos;t have an account? Sign Up
+          Forgot Password?
         </Link>
       </p>
     </div>

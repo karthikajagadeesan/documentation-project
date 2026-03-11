@@ -5,7 +5,7 @@ import { Database } from '@/types/database-type'
 import { redirect } from 'next/navigation'
 import { createClient } from './server'
 
-const AUTH_PATHS = ['/login', '/signup']
+const AUTH_PATHS = ['/login', '/signup', '/forgot-password','/reset-password']
 
 export async function updateSession(request: NextRequest) {
     let supabaseResponse = NextResponse.next({
@@ -34,6 +34,24 @@ export async function updateSession(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
     const hostname = request.headers.get("host") || request.nextUrl.hostname;
     const subdomain = DomainFinder(hostname)
+
+    // Handle Auth Callback (Code Exchange)
+    if (pathname === '/auth/callback') {
+        const code = request.nextUrl.searchParams.get('code')
+        if (code) {
+            await supabase.auth.exchangeCodeForSession(code)
+            const next = request.nextUrl.searchParams.get('next') || '/'
+            const response = NextResponse.redirect(new URL(next, request.url))
+            // If redirecting to reset-password, set a temporary cookie to allow access once
+            if (next.startsWith('/reset-password')) {
+                response.cookies.set('reset_allowed', 'true', { maxAge: 300, path: '/' })
+            }
+            // Copy cookies from supabaseResponse to the redirect response
+            supabaseResponse.cookies.getAll().forEach(c => response.cookies.set(c.name, c.value, c))
+            return response
+        }
+    }
+
     const isAuthPath = AUTH_PATHS.some((path) => pathname.startsWith(path))
 
     if (subdomain === "superadmin" || subdomain === "user") {
@@ -41,17 +59,27 @@ export async function updateSession(request: NextRequest) {
         const user = data?.user;
 
         if (isAuthPath && user) {
+            // Special exception for reset-password: only allow if they have the temporary cookie
+            if (pathname === '/reset-password') {
+                if (request.cookies.get('reset_allowed')) {
+                    // Allow access and consume the cookie
+                    supabaseResponse.cookies.delete('reset_allowed')
+                    return supabaseResponse
+                }
+            }
             return NextResponse.redirect(new URL('/', request.url))
         }
-        
-        if (pathname === '/' && subdomain !== "user") {
-            return NextResponse.redirect(
-                new URL(user ? '/' : '/login', request.url)
-            )
+
+        // Explicitly block guests from /reset-password even though it's an AUTH_PATH
+        if (pathname === '/reset-password' && !user) {
+            return NextResponse.redirect(new URL('/login', request.url))
         }
         
-        if (pathname === '/' && subdomain === "user") {
-            return supabaseResponse;
+        if (pathname === '/') {
+            if (!user) {
+                return NextResponse.redirect(new URL('/login', request.url))
+            }
+            return supabaseResponse
         }
         
         if (!user && !isAuthPath) {

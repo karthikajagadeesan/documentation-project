@@ -1,13 +1,10 @@
 'use client'
 
-import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { useState } from 'react'
-import { Eye, EyeOff } from 'lucide-react'
-import type { LoginFormValues } from '@/types/general-type'
+import { useRouter } from 'next/navigation'
 import {
   Form,
   FormControl,
@@ -25,79 +22,79 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { createClient } from '@/lib/supabase/client'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Eye, EyeOff } from 'lucide-react'
 
-const loginSchema = z.object({
-  email: z.string().email({ message: 'Invalid email address' }),
+const resetPasswordSchema = z.object({
   password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 })
 
-import { Alert, AlertDescription } from '@/components/ui/alert'
+type ResetPasswordValues = z.infer<typeof resetPasswordSchema>
 
-export function LoginForm() {
+export function ResetPasswordForm() {
   const router = useRouter()
   const supabase = createClient()
   const [showPassword, setShowPassword] = useState(false)
-  const [errorStatus, setErrorStatus] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
 
-  const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<ResetPasswordValues>({
+    resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
-      email: '',
       password: '',
+      confirmPassword: '',
     },
   })
 
-  async function onSubmit(data: LoginFormValues) {
-    setErrorStatus(null)
-    const { error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
+  async function onSubmit(data: ResetPasswordValues) {
+    setError(null)
+    const { error } = await supabase.auth.updateUser({
+      password: data.password
     })
 
     if (error) {
-      setErrorStatus(error.message)
+      setError(error.message)
       return
     }
 
-    router.push('/')
-    router.refresh()
+    setSuccess(true)
+    setTimeout(() => {
+      router.replace('/')
+    }, 2000)
   }
 
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle className="text-2xl">Welcome Back</CardTitle>
+        <CardTitle className="text-2xl">Reset Password</CardTitle>
         <CardDescription>
-          Sign in to your account to continue
+          Enter your new password below.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {errorStatus && (
+        {error && (
           <Alert variant="destructive" className="mb-4">
-            <AlertDescription>{errorStatus}</AlertDescription>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        {success && (
+          <Alert className="mb-4 border-green-500 bg-green-50 text-green-700">
+            <AlertDescription>Password updated successfully! Redirecting to dashboard...</AlertDescription>
           </Alert>
         )}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="name@example.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>New Password</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Input
@@ -118,11 +115,25 @@ export function LoginForm() {
                         ) : (
                           <Eye className="h-4 w-4 text-muted-foreground" />
                         )}
-                        <span className="sr-only">
-                          {showPassword ? 'Hide password' : 'Show password'}
-                        </span>
                       </Button>
                     </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="••••••••"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -131,12 +142,12 @@ export function LoginForm() {
             <Button
               type="submit"
               className="w-full"
-              disabled={form.formState.isSubmitting}
+              disabled={form.formState.isSubmitting || success}
             >
               {form.formState.isSubmitting && (
                 <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
               )}
-              Sign In
+              Update Password
             </Button>
           </form>
         </Form>

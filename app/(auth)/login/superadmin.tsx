@@ -1,4 +1,5 @@
 import { LoginForm } from '@/components/auth/LoginForm'
+import Link from 'next/link'
 
 export default function SuperAdminLogin() {
   return (
@@ -10,6 +11,20 @@ export default function SuperAdminLogin() {
         </p>
       </div>
       <LoginForm />
+      <div className="flex flex-col space-y-2 text-center text-sm text-muted-foreground">
+        <Link
+          href="/signup"
+          className="hover:text-brand underline underline-offset-4"
+        >
+          Don&apos;t have an account? Sign Up
+        </Link>
+        <Link
+          href="/forgot-password"
+          className="hover:text-brand underline underline-offset-4"
+        >
+          Forgot Password?
+        </Link>
+      </div>
     </div>
   )
 }
