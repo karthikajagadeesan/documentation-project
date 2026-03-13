@@ -24,7 +24,8 @@ import {
 } from '@/components/ui/card'
 import { createClient } from '@/lib/supabase/client'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 const resetPasswordSchema = z.object({
   password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
@@ -40,6 +41,7 @@ export function ResetPasswordForm() {
   const router = useRouter()
   const supabase = createClient()
   const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
@@ -53,19 +55,26 @@ export function ResetPasswordForm() {
 
   async function onSubmit(data: ResetPasswordValues) {
     setError(null)
-    const { error } = await supabase.auth.updateUser({
-      password: data.password
-    })
+    const toastId = toast.loading('Updating password...')
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: data.password
+      })
 
-    if (error) {
-      setError(error.message)
-      return
-    }
+      if (error) {
+        setError(error.message)
+        toast.error(error.message, { id: toastId })
+        return
+      }
 
-    setSuccess(true)
-    setTimeout(() => {
+      setSuccess(true)
+      toast.success('Password updated successfully!', { id: toastId })
+      await new Promise(resolve => setTimeout(resolve, 2000))
       router.replace('/')
-    }, 2000)
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred')
+      toast.error(err.message || 'An unexpected error occurred', { id: toastId })
+    }
   }
 
   return (
@@ -80,11 +89,6 @@ export function ResetPasswordForm() {
         {error && (
           <Alert variant="destructive" className="mb-4">
             <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-        {success && (
-          <Alert className="mb-4 border-green-500 bg-green-50 text-green-700">
-            <AlertDescription>Password updated successfully! Redirecting to dashboard...</AlertDescription>
           </Alert>
         )}
         <Form {...form}>
@@ -129,11 +133,27 @@ export function ResetPasswordForm() {
                 <FormItem>
                   <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="••••••••"
-                      {...field}
-                    />
+                 <div className="relative">
+                      <Input
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        placeholder="••••••••"
+                        className="pr-10"
+                        {...field}
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -141,13 +161,17 @@ export function ResetPasswordForm() {
             />
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-navbar-gradient hover:opacity-90 border-none transition-all duration-300 shadow-lg text-white font-semibold"
               disabled={form.formState.isSubmitting || success}
             >
-              {form.formState.isSubmitting && (
-                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+              {form.formState.isSubmitting ? (
+                <>
+                  Updating password
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                </>
+              ) : (
+                'Update Password'
               )}
-              Update Password
             </Button>
           </form>
         </Form>

@@ -261,14 +261,14 @@ const technologies: TechItem[] = [
     docs: "https://nextjs.org/docs",
     tags: ["Framework", "Full-Stack", "React"],
     tagline: "The React framework for production — handles routing, rendering, APIs, and optimizations out of the box.",
-    what: "Next.js is a full-stack React framework developed by Vercel. It extends React by adding built-in file-system routing, multiple rendering strategies (SSR, SSG, ISR), API routes, middleware, image and font optimization, and a powerful App Router introduced in v13. It removes the need for separate routing libraries, custom webpack configs, and server setup — everything works from day one.",
+    what: "Next.js is a full-stack React framework developed by Vercel. It extends React by adding built-in file-system routing, multiple rendering strategies (SSR, SSG, ISR), API routes, proxy, image and font optimization, and a powerful App Router introduced in v13. It removes the need for separate routing libraries, custom webpack configs, and server setup — everything works from day one.",
     why: "Teams choose Next.js because it collapses the frontend and backend into a single coherent codebase. You get server-side rendering for SEO-critical pages, static generation for blazing-fast delivery, React Server Components to eliminate unnecessary JS shipped to the browser, and API routes to handle backend logic — all without reaching for Express, React Router, or a separate server.",
     useCases: [
       { title: "Marketing Sites", desc: "Statically generated pages with fast load times and built-in SEO metadata APIs." },
       { title: "E-commerce", desc: "ISR (Incremental Static Regeneration) keeps product pages fresh without full rebuilds." },
       { title: "Dashboards", desc: "Client components handle interactivity while server components fetch data securely." },
       { title: "API Backend", desc: "Route Handlers (route.ts) replace the need for a separate Express/Fastify server." },
-      { title: "Authentication", desc: "Middleware runs at the edge before routes, ideal for session-based auth guards." },
+      { title: "Authentication", desc: "Proxy runs at the edge before routes, ideal for session-based auth guards." },
       { title: "Multi-tenant Apps", desc: "Dynamic routing and rewrites support complex domain-per-tenant architectures." },
     ],
     install: [
@@ -287,7 +287,7 @@ const technologies: TechItem[] = [
         ["error.tsx", "Error boundary UI", "Must be a Client Component"],
         ["not-found.tsx", "404 UI for segment", "Triggered by notFound() helper"],
         ["route.ts", "API endpoint handler", "Replaces pages/api — supports GET, POST, etc."],
-        ["middleware.ts", "Edge logic before request", "Auth guards, redirects, rewrites"],
+        ["proxy.ts", "Edge logic before request", "Auth guards, redirects, rewrites"],
       ],
     },
     codeExample: {
@@ -584,7 +584,7 @@ export default function CreateUserDialog() {
     docs: "https://docs.pmnd.rs/zustand/getting-started/introduction",
     tags: ["State Management", "Client-side", "React"],
     tagline: "Minimal, fast, and scalable global state management for React — no boilerplate, no providers, no magic.",
-    what: "Zustand is a lightweight global state management library for React. It creates stores as simple JavaScript objects with state and actions. Compared to Redux (actions, reducers, dispatchers, middleware), Zustand has almost no boilerplate. Components subscribe to only the slices of state they use, preventing unnecessary re-renders. Zustand stores exist outside the React tree, making state accessible anywhere — including inside event handlers, utilities, and even outside components.",
+    what: "Zustand is a lightweight global state management library for React. It creates stores as simple JavaScript objects with state and actions. Compared to Redux (actions, reducers, dispatchers, proxy), Zustand has almost no boilerplate. Components subscribe to only the slices of state they use, preventing unnecessary re-renders. Zustand stores exist outside the React tree, making state accessible anywhere — including inside event handlers, utilities, and even outside components.",
     why: "React's built-in useState is great for local state but breaks down when state needs to be shared across many disconnected components. Context API works but re-renders every consumer on any change. Zustand solves both problems: it's global, it supports granular subscriptions (only re-render when the piece of state you use changes), and its API is a simple function call — no wrapping your app in a Provider tree required.",
     useCases: [
       { title: "Auth State", desc: "Store the logged-in user object and authentication status globally, accessible from any component." },
@@ -614,7 +614,7 @@ export default function CreateUserDialog() {
       lang: "typescript",
       code: `// store/useAppStore.ts
 import { create } from "zustand";
-import { persist } from "zustand/middleware"; // persist to localStorage
+import { persist } from "zustand/proxy"; // persist to localStorage
 
 interface User {
   id: string;
@@ -662,13 +662,13 @@ const { sidebarOpen, toggleSidebar } = useAppStore((state) => ({
   sidebarOpen: state.sidebarOpen,
   toggleSidebar: state.toggleSidebar,
 }));`,
-      note: "The persist middleware automatically saves/restores state from localStorage. Use shallow comparison when subscribing to objects to prevent unnecessary re-renders.",
+      note: "The persist proxy automatically saves/restores state from localStorage. Use shallow comparison when subscribing to objects to prevent unnecessary re-renders.",
     },
     pros: [
       "Minimal boilerplate — a store is just a function, no actions/reducers/dispatchers",
       "Granular subscriptions prevent unnecessary re-renders automatically",
       "No Provider wrapper needed — works outside React components too",
-      "Built-in middleware: persist (localStorage), devtools (Redux DevTools), immer (mutations)",
+      "Built-in proxy: persist (localStorage), devtools (Redux DevTools), immer (mutations)",
       "Tiny bundle size (~3 kb gzipped)",
       "TypeScript support is excellent with full type inference",
       "Works seamlessly alongside server state solutions like TanStack Query",
@@ -826,10 +826,12 @@ const TechnologyList = () => {
               variant="outline"
               size="sm"
               asChild
-              className="h-8 gap-1.5 text-xs font-medium"
+              className="group h-8 gap-1.5 text-xs font-medium"
             >
               <a href={`#${t.id}`}>
-                <span className="text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
+                <span className="text-foreground group-hover:text-white">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
                 {t.title}
               </a>
             </Button>

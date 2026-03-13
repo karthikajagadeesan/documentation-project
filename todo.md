@@ -13,12 +13,12 @@ When the application loads at `http://localhost:3000`, the following auth flow a
 - If a user **signs up**, they are not immediately logged in — they must **log in separately** after registration.
 - After a **successful login**, the user is redirected to `/` (the main dashboard).
 
-This flow is enforced via Next.js **Middleware** (`middleware.ts`) and Supabase Auth session checks.
+This flow is enforced via Next.js **proxy** (`proxy.ts`) and Supabase Auth session checks.
 
 ```
 http://localhost:3000
         ↓
-  [Auth Check — Middleware]
+  [Auth Check — proxy]
         ↓
   Not logged in?          Logged in?
         ↓                      ↓
@@ -230,7 +230,7 @@ Render each technology as an **Accordion component** (expandable/collapsible). E
 
 - Docs link: https://nextjs.org/docs
 - **What is Next.js?** React-based full-stack framework with routing, API handling, SSR, and performance optimization.
-- Supports: SSR, SSG, App Router, API Routes, Middleware, Edge runtime.
+- Supports: SSR, SSG, App Router, API Routes, proxy, Edge runtime.
 
 **Installation & Setup**
 ```
@@ -259,7 +259,7 @@ Runs at: http://localhost:3000
 - Server: `const data = await fetch(url)`
 - Client: `useEffect(() => { fetchData() }, [])`
 
-**Middleware:** Used for auth redirect and route protection. File: `middleware.ts`
+**proxy:** Used for auth redirect and route protection. File: `proxy.ts`
 
 **Environment Variables:** Stored in `.env.local`
 ```

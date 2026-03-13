@@ -9,7 +9,7 @@ const stackSummary = [
     name: "Next.js",
     role: "Application Framework",
     summary:
-      "Serves as the foundation of the project — handling routing, rendering strategies (SSR, SSG, ISR), API endpoints via Route Handlers, and React Server Components that eliminate unnecessary JavaScript shipped to the browser. All pages, layouts, and middleware live within Next.js's file-system conventions.",
+      "Serves as the foundation of the project — handling routing, rendering strategies (SSR, SSG, ISR), API endpoints via Route Handlers, and React Server Components that eliminate unnecessary JavaScript shipped to the browser. All pages, layouts, and proxy live within Next.js's file-system conventions.",
   },
   {
     name: "Supabase",
@@ -27,7 +27,7 @@ const stackSummary = [
     name: "Zustand",
     role: "Client State Management",
     summary:
-      "Manages global client-side state — authenticated user, sidebar visibility, notification queue, and UI preferences. Granular subscriptions ensure components only re-render when their specific slice of state changes, and the persist middleware syncs relevant state to localStorage automatically.",
+      "Manages global client-side state — authenticated user, sidebar visibility, notification queue, and UI preferences. Granular subscriptions ensure components only re-render when their specific slice of state changes, and the persist proxy syncs relevant state to localStorage automatically.",
   },
   {
     name: "TanStack Query",

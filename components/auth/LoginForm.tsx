@@ -6,7 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { useState } from 'react'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 import type { LoginFormValues } from '@/types/general-type'
 import {
   Form,
@@ -24,7 +25,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@/components/ui/card'
+import Link from 'next/link'
 
 const loginSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
@@ -33,7 +36,7 @@ const loginSchema = z.object({
 
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
-export function LoginForm() {
+export function LoginForm({ showSignUp = true }: { showSignUp?: boolean }) {
   const router = useRouter()
   const supabase = createClient()
   const [showPassword, setShowPassword] = useState(false)
@@ -49,26 +52,34 @@ export function LoginForm() {
 
   async function onSubmit(data: LoginFormValues) {
     setErrorStatus(null)
-    const { error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    })
+    const toastId = toast.loading('Logging in...')
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      })
 
-    if (error) {
-      setErrorStatus(error.message)
-      return
+      if (error) {
+        setErrorStatus(error.message)
+        toast.error(error.message, { id: toastId })
+        return
+      }
+
+      toast.success('Successfully logged in!', { id: toastId })
+      router.push('/')
+      router.refresh()
+    } catch (err: any) {
+      toast.error(err.message || 'An unexpected error occurred', { id: toastId })
+      setErrorStatus(err.message || 'An unexpected error occurred')
     }
-
-    router.push('/')
-    router.refresh()
   }
 
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle className="text-2xl">Welcome Back</CardTitle>
+        <CardTitle className="text-lg">Welcome Back</CardTitle>
         <CardDescription>
-          Sign in to your account to continue
+         Login to your account to continue
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -97,7 +108,15 @@ export function LoginForm() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <div className="flex items-center justify-between">
+                    <FormLabel>Password</FormLabel>
+                    <Link
+                      href="/forgot-password"
+                      className="text-sm font-medium text-primary hover:underline underline-offset-4"
+                    >
+                      Forgot your password?
+                    </Link>
+                  </div>
                   <FormControl>
                     <div className="relative">
                       <Input
@@ -130,16 +149,31 @@ export function LoginForm() {
             />
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-navbar-gradient hover:opacity-90 border-none transition-all duration-300 shadow-lg text-white font-semibold"
               disabled={form.formState.isSubmitting}
             >
-              {form.formState.isSubmitting && (
-                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+              {form.formState.isSubmitting ? (
+                <>
+                    Logging
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                </>
+              ) : (
+                'Login'
               )}
-              Sign In
             </Button>
           </form>
         </Form>
+        {showSignUp && (
+          <div className="mt-4 text-center text-sm text-muted-foreground">
+            Don&apos;t have an account?{' '}
+            <Link
+              href="/signup"
+              className="text-primary font-medium hover:underline underline-offset-4"
+            >
+              Sign Up
+            </Link>
+          </div>
+        )}
       </CardContent>
     </Card>
   )

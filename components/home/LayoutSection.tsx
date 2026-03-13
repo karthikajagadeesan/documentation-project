@@ -73,7 +73,7 @@ const folders = [
   },
   {
     path: "utils/supabase/",
-    purpose: "Supabase client factory functions — returns the correct client based on execution context (browser, server, or middleware).",
+    purpose: "Supabase client factory functions — returns the correct client based on execution context (browser, server, or proxy).",
     files: ["admin.ts", "client.ts", "index.ts", "proxy.ts", "server.ts"],
   },
   {

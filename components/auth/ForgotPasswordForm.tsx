@@ -23,7 +23,8 @@ import {
 } from '@/components/ui/card'
 import { resetPassword } from '@/app/actions/auth-actions'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 
 const forgotPasswordSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
@@ -44,14 +45,22 @@ export function ForgotPasswordForm() {
 
   async function onSubmit(data: ForgotPasswordValues) {
     setError(null)
-    const result = await resetPassword(data.email)
-    
-    if (result?.error) {
-      setError(result.error)
-      return
-    }
+    const toastId = toast.loading('Sending reset link...')
+    try {
+      const result = await resetPassword(data.email)
+      
+      if (result?.error) {
+        setError(result.error)
+        toast.error(result.error, { id: toastId })
+        return
+      }
 
-    setIsSubmitted(true)
+      setIsSubmitted(true)
+      toast.success('Reset link sent to your email!', { id: toastId })
+    } catch (err: any) {
+      setError(err.message || 'An unexpected error occurred')
+      toast.error(err.message || 'An unexpected error occurred', { id: toastId })
+    }
   }
 
   if (isSubmitted) {
@@ -101,13 +110,17 @@ export function ForgotPasswordForm() {
             />
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-navbar-gradient hover:opacity-90 border-none transition-all duration-300 shadow-lg text-white font-semibold"
               disabled={form.formState.isSubmitting}
             >
-              {form.formState.isSubmitting && (
-                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+              {form.formState.isSubmitting ? (
+                <>
+                 Sending link
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                </>
+              ) : (
+                'Send Reset Link'
               )}
-              Send Reset Link
             </Button>
           </form>
         </Form>

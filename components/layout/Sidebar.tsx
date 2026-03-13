@@ -76,9 +76,80 @@ const Sidebar = ({ className, onLinkClick }: { className?: string; onLinkClick?:
 
   React.useEffect(() => {
     setActiveHref(window.location.hash);
-    const handleHashChange = () => setActiveHref(window.location.hash);
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      setActiveHref(hash);
+      
+      // Auto-expand parent if hash matches a sub-item
+      navItems.forEach(item => {
+        if (item.items?.some(sub => sub.href === hash)) {
+          setExpanded(prev => ({ ...prev, [item.title]: true }));
+        }
+      });
+    };
+
     window.addEventListener("hashchange", handleHashChange);
-    return () => window.removeEventListener("hashchange", handleHashChange);
+
+    // Scroll-based active section detection
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Collect all intersecting IDs
+        const intersectingIds = entries
+          .filter(entry => entry.isIntersecting)
+          .map(entry => `#${entry.target.id}`);
+
+        if (intersectingIds.length > 0) {
+          // Find if any of the intersecting IDs is a sub-item
+          let targetHref = intersectingIds[0];
+          
+          // Heuristic: If multiple are intersecting, prefer sub-items (they are "deeper")
+          // or just pick the one that is closest to the top of the viewport
+          for (const id of intersectingIds) {
+            const isSubItem = navItems.some(item => item.items?.some(sub => sub.href === id));
+            if (isSubItem) {
+              targetHref = id;
+              break; 
+            }
+          }
+
+          setActiveHref(targetHref);
+
+          // Auto-expand parent of the active section
+          navItems.forEach(item => {
+            if (item.href === targetHref || item.items?.some(sub => sub.href === targetHref)) {
+              setExpanded(prev => {
+                if (prev[item.title]) return prev; // Avoid unnecessary state updates
+                return { ...prev, [item.title]: true };
+              });
+            }
+          });
+        }
+      },
+      { 
+        threshold: [0, 0.1, 0.5, 1.0], 
+        rootMargin: "-20% 0px -60% 0px" // Focus on the upper-middle part of the viewport
+      }
+    );
+
+    // Get all potential IDs from navItems
+    const ids = navItems.flatMap(item => [
+      item.href?.replace("#", ""),
+      ...(item.items?.map(sub => sub.href?.replace("#", "")) || [])
+    ]).filter(Boolean);
+
+    // Initial observer connection with a small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      ids.forEach(id => {
+        const element = document.getElementById(id!);
+        if (element) observer.observe(element);
+      });
+    }, 100);
+
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+      observer.disconnect();
+      clearTimeout(timer);
+    };
   }, []);
 
   const getIsActive = (href: string) => {
@@ -100,8 +171,8 @@ const Sidebar = ({ className, onLinkClick }: { className?: string; onLinkClick?:
   };
 
   return (
-    <aside className={`flex w-56 shrink-0 flex-col overflow-hidden border-r bg-background ${className || ""}`}>
-      <div className="flex-1 overflow-y-auto px-4 py-8">
+    <aside className={`flex w-56 shrink-0 flex-col overflow-hidden bg-sidebar-gradient ${className || ""}`}>
+      <div className="flex-1 overflow-y-auto px-4 py-8 custom-scrollbar">
         <div className="w-full space-y-4">
           {navItems.map((item) => (
             <div key={item.title} className="space-y-1">
@@ -111,7 +182,7 @@ const Sidebar = ({ className, onLinkClick }: { className?: string; onLinkClick?:
                     variant="ghost"
                     size="icon"
                     onClick={() => toggleExpand(item.title)}
-                    className="mr-1 h-6 w-6 shrink-0"
+                    className="mr-1 h-6 w-6 shrink-0 text-white hover:bg-white/10"
                   >
                     {expanded[item.title] ? (
                       <ChevronDown className="h-4 w-4" />
@@ -124,8 +195,12 @@ const Sidebar = ({ className, onLinkClick }: { className?: string; onLinkClick?:
                 {item.href ? (
                   <Button
                     asChild
-                    variant={getIsActive(item.href || "") ? "secondary" : "ghost"}
-                    className="h-8 w-full justify-start px-2 py-1 text-sm font-medium"
+                    variant="ghost"
+                    className={`h-8 w-full justify-start px-2 py-1 text-sm font-medium transition-colors ${
+                      getIsActive(item.href || "") 
+                        ? "bg-white/20 text-white" 
+                        : "text-white/70 hover:text-white hover:bg-white/10"
+                    }`}
                   >
                     <Link 
                       href={item.href} 
@@ -138,22 +213,22 @@ const Sidebar = ({ className, onLinkClick }: { className?: string; onLinkClick?:
                     </Link>
                   </Button>
                 ) : (
-                  <span className="flex h-8 w-full cursor-default items-center px-2 py-1 text-sm font-medium">
+                  <span className="flex h-8 w-full cursor-default items-center px-2 py-1 text-sm font-medium text-white/70">
                     {item.title}
                   </span>
                 )}
               </div>
               {item.items && expanded[item.title] && (
-                <div className="ml-5 space-y-1 border-l pl-4">
+                <div className="ml-5 space-y-1 border-l border-white/10 pl-4">
                   {item.items.map((subItem) => (
                     <Button
                       key={subItem.title}
                       asChild
-                      variant={activeHref === subItem.href ? "secondary" : "ghost"}
-                      className={`h-8 w-full justify-start px-2 py-1 text-sm ${
+                      variant="ghost"
+                      className={`h-8 w-full justify-start px-2 py-1 text-sm transition-colors ${
                         activeHref === subItem.href 
-                          ? "text-foreground font-medium" 
-                          : "text-muted-foreground hover:text-foreground"
+                          ? "bg-white/20 text-white font-medium shadow-sm" 
+                          : "text-white/60 hover:text-white hover:bg-white/10"
                       }`}
                     >
                       <Link 
@@ -173,7 +248,7 @@ const Sidebar = ({ className, onLinkClick }: { className?: string; onLinkClick?:
           ))}
         </div>
       </div>
-      <div className="border-t p-4">
+      <div className="border-t border-white/10 p-4">
         <SignOutButton />
       </div>
     </aside>
@@ -183,6 +258,7 @@ const Sidebar = ({ className, onLinkClick }: { className?: string; onLinkClick?:
 function SignOutButton() {
   const [isPending, startTransition] = useTransition();
   const [userName, setUserName] = useState<string>("Loading...");
+  const [userInitial, setUserInitial] = useState<string>("U");
 
   React.useEffect(() => {
     const fetchUser = async () => {
@@ -191,6 +267,7 @@ function SignOutButton() {
       if (data?.user) {
         const name = data.user.user_metadata?.full_name || data.user.email?.split('@')[0] || "User";
         setUserName(name);
+        setUserInitial(name.charAt(0).toUpperCase());
       } else {
         setUserName("Sign Out");
       }
@@ -200,14 +277,17 @@ function SignOutButton() {
 
   return (
     <Button
-      variant="outline"
-      className="w-full justify-between text-muted-foreground"
+      variant="ghost"
+      className="w-full justify-start gap-3 text-white/80 hover:bg-white/10 hover:text-white px-2"
       onClick={() => startTransition(() => signOut())}
       disabled={isPending}
       title="Sign Out"
     >
-      <span className="truncate">{userName}</span>
-      <LogOut className={`ml-2 h-4 w-4 shrink-0 ${isPending ? "animate-pulse" : ""}`} />
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-secondary text-[12px] font-bold text-white shadow-lg">
+        {userInitial}
+      </div>
+      <span className="truncate text-xs font-medium">{userName}</span>
+      <LogOut className={`ml-auto h-3.5 w-3.5 shrink-0 opacity-50 ${isPending ? "animate-pulse" : ""}`} />
     </Button>
   );
 }

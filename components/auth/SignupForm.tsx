@@ -6,7 +6,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { useState } from 'react'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 import type { SignupFormValues } from '@/types/general-type'
 import {
   Form,
@@ -24,7 +25,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@/components/ui/card'
+import Link from 'next/link'
 
 const signupSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
@@ -47,29 +50,34 @@ export function SignupForm() {
   })
 
   async function onSubmit(data: SignupFormValues) {
-    const { error } = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-      options: {
-        data: {
-          full_name: data.name,
+    const toastId = toast.loading('Creating account...')
+    try {
+      const { error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            full_name: data.name,
+          },
         },
-      },
-    })
+      })
 
-    if (error) {
-      alert(error.message)
-      return
+      if (error) {
+        toast.error(error.message, { id: toastId })
+        return
+      }
+
+      toast.success('Check your email for confirmation!', { id: toastId })
+      router.push('/login')
+    } catch (err: any) {
+      toast.error(err.message || 'An unexpected error occurred', { id: toastId })
     }
-
-    alert('Check your email for confirmation!')
-    router.push('/login')
   }
 
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle className="text-2xl">Create an account</CardTitle>
+        <CardTitle className="text-lg">Create an account</CardTitle>
         <CardDescription>
           Enter your details below to create your account
         </CardDescription>
@@ -141,16 +149,29 @@ export function SignupForm() {
             />
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-navbar-gradient hover:opacity-90 border-none transition-all duration-300 shadow-lg text-white font-semibold"
               disabled={form.formState.isSubmitting}
             >
-              {form.formState.isSubmitting && (
-                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+              {form.formState.isSubmitting ? (
+                <>
+                  Creating account
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                </>
+              ) : (
+                'Sign Up'
               )}
-              Sign Up
             </Button>
           </form>
         </Form>
+        <div className="mt-4 text-center text-sm text-muted-foreground">
+          Already have an account?{' '}
+          <Link
+            href="/login"
+            className="text-primary font-medium hover:underline underline-offset-4"
+          >
+            Login
+          </Link>
+        </div>
       </CardContent>
     </Card>
   )

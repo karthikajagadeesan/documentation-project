@@ -1,6 +1,7 @@
 import Navbar from "@/components/layout/Navbar";
 import { requireAuth } from "@/lib/supabase/proxy";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { Construction } from "lucide-react";
 
 export default async function DesignPage() {
   await requireAuth();
@@ -15,11 +16,15 @@ export default async function DesignPage() {
             UI/UX guidelines, design system, and ShadCN components.
           </p>
         </div>
-        <Card className="p-8">
-          <CardContent className="p-0">
-            <p className="text-muted-foreground">This section is currently under development.</p>
-          </CardContent>
-        </Card>
+        <div className="flex min-h-[400px] flex-col items-center justify-center rounded-xl border-2 border-dashed border-muted-foreground/20 bg-muted/5 p-12 text-center">
+          <div className="mb-4 rounded-full bg-primary/10 p-4">
+            <Construction className="h-10 w-10 text-primary" />
+          </div>
+          <h2 className="text-xl font-semibold tracking-tight">This section is currently under development</h2>
+          <p className="mt-2 text-sm text-muted-foreground max-w-[420px]">
+            We're currently building out the design guidelines and component libraries. Check back soon for updates!
+          </p>
+        </div>
       </main>
     </div>
   );

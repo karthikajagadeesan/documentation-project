@@ -13,8 +13,8 @@ export default async function Home() {
       description: "Technical stack, architecture, and project structure guide.",
       icon: Code,
       href: "/development",
-      color: "text-primary",
-      bg: "bg-primary/10",
+      color: "text-accent-foreground",
+      bg: "bg-primary",
     },
     {
       title: "Design",
@@ -37,8 +37,8 @@ export default async function Home() {
       description: "Company policies, onboarding, and employee resources.",
       icon: Users,
       href: "/hr",
-      color: "text-muted-foreground",
-      bg: "bg-muted",
+      color: "text-secondary-foreground",
+      bg: "bg-primary/20",
     },
   ];
 
@@ -61,16 +61,18 @@ export default async function Home() {
               className="group"
             >
               <Card className="h-full group-hover:border-primary/50 transition-all shadow-sm group-hover:shadow-md flex flex-col justify-between p-6">
-                <div>
-                  <div className={`mb-4 inline-flex rounded-lg p-3 ${card.bg}`}>
+                <div className="flex justify-between items-start gap-4">
+                  <div className="flex-1">
+                    <h3 className="mb-2 font-semibold leading-none tracking-tight">
+                      {card.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground line-clamp-3">
+                      {card.description}
+                    </p>
+                  </div>
+                  <div className={`shrink-0 rounded-lg p-3 ${card.bg}`}>
                     <card.icon className={`h-6 w-6 ${card.color}`} />
                   </div>
-                  <h3 className="mb-2 font-semibold leading-none tracking-tight">
-                    {card.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {card.description}
-                  </p>
                 </div>
                 <div className="mt-4 flex items-center text-sm font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
                   View section &rarr;

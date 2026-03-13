@@ -23,7 +23,7 @@ export async function createClient() {
           cookieStore.set({ name, value, ...options })
         } catch {
           // Intentionally ignored: `set` called from a Server Component.
-          // Middleware handles session refresh instead.
+          // proxy handles session refresh instead.
         }
       },
       remove(name: string, options: CookieOptions) {

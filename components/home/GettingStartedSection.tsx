@@ -10,7 +10,7 @@ const frontendStack = [
     description:
       "Full-stack React framework with server-side rendering, file-based routing, and built-in API routes. Powers both the UI and edge functions in a single project.",
     why: "SSR + SEO + performance out of the box",
-    color: "bg-foreground text-background",
+    color: "bg-primary text-background",
     link: null,
   },
   {
@@ -19,7 +19,7 @@ const frontendStack = [
     description:
       "Component-based library for building interactive UIs. React's Virtual DOM ensures efficient re-renders; hooks handle lifecycle and state cleanly.",
     why: "Composable, declarative, and battle-tested",
-    color: "bg-primary text-primary-foreground",
+    color: "bg-ring text-primary-foreground",
     link: "https://react.dev/learn",
   },
   {
@@ -46,7 +46,7 @@ const frontendStack = [
     description:
       "Utility-first CSS framework. Write responsive, dark-mode-aware styles inline without leaving your markup — no naming collisions, no dead CSS.",
     why: "Fast to write, easy to maintain",
-    color: "bg-muted text-muted-foreground",
+    color: "bg-destructive text-primary-foreground",
     link: "https://tailwindcss.com/docs/installation/framework-guides",
   },
   {
@@ -55,7 +55,7 @@ const frontendStack = [
     description:
       "The core language running in every browser and Node.js server. Handles dynamic behavior, event handling, and async data flows.",
     why: "Native to every environment",
-    color: "bg-primary/20 text-primary",
+    color: "bg-foreground text-primary-foreground",
     link: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
   },
 ];
@@ -205,7 +205,7 @@ export default function GettingStartedSection() {
               <div className="flex items-start justify-between gap-2">
                 <h4 className="font-bold text-foreground">{name}</h4>
                 <Badge
-                  variant="secondary"
+                  variant="outline"
                   className={`shrink-0 text-[10px] font-semibold uppercase tracking-wide ${color}`}
                 >
                   {badge}
@@ -257,7 +257,7 @@ export default function GettingStartedSection() {
               <div className="flex shrink-0 flex-col gap-1 sm:w-36">
                 <span className="font-bold text-foreground">{name}</span>
                 <Badge
-                  variant="secondary"
+                  variant="outline"
                   className="w-fit text-[10px] font-semibold uppercase tracking-wide text-primary bg-primary/10"
                 >
                   {badge}
@@ -296,7 +296,7 @@ export default function GettingStartedSection() {
               <div className="flex items-start justify-between gap-2">
                 <h4 className="font-bold text-foreground">{name}</h4>
                 <Badge
-                  variant="secondary"
+                  variant="outline"
                   className="shrink-0 text-[10px] font-semibold uppercase tracking-wide text-primary bg-primary/10"
                 >
                   {scope}
